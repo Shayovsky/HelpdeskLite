@@ -1,0 +1,88 @@
+﻿@model Ticket
+
+@{
+    ViewData["Title"] = "Ticket Details";
+}
+
+<h2 class="mb-4">Szczegóły zgłoszenia</h2>
+
+<div class="card mb-4 shadow-sm">
+    <div class="card-body">
+        <h4 class="card-title">@Model.Title</h4>
+        <p class="card-text">@Model.Description</p>
+        <p class="text-muted mb-0">
+            <strong>Utworzono:</strong> @Model.CreatedAt.ToString("g") <br />
+            <strong>Autor:</strong> @Model.CreatedBy
+        </p>
+    </div>
+</div>
+
+<div class="d-flex gap-2 mb-4">
+    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Edytuj</a>
+    <a asp-action="Index" class="btn btn-secondary">Powrót</a>
+</div>
+
+<hr />
+
+<h3 class="mb-3">Komentarze</h3>
+
+@if (Model.Comments.Any())
+{
+    <ul class="list-group mb-4">
+        @foreach (var comment in Model.Comments.OrderByDescending(c => c.CreatedAt))
+        {
+            <li class="list-group-item">
+                <div class="d-flex justify-content-between">
+                    <strong>@comment.User?.UserName</strong>
+                    <em class="text-muted">@comment.CreatedAt.ToString("g")</em>
+                </div>
+                <p class="mt-2 mb-0">@comment.Content</p>
+            </li>
+        }
+    </ul>
+}
+else
+{
+    <p class="text-muted">Brak komentarzy.</p>
+}
+
+<div class="card mb-4 shadow-sm">
+    <div class="card-body">
+        <h4 class="card-title">Dodaj komentarz</h4>
+
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+        <form asp-action="AddComment" method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="ticketId" value="@Model.Id" />
+
+            <div class="mb-3">
+                <label for="commentContent" class="form-label">Treść komentarza</label>
+                <textarea id="commentContent" class="form-control" name="Content" rows="3" required maxlength="500"></textarea>
+                <span class="text-danger"></span>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Dodaj komentarz</button>
+        </form>
+    </div>
+</div>
+
+<hr />
+
+<h3 class="mb-3">Załączniki</h3>
+
+@if (Model.Attachments.Any())
+{
+    <ul class="list-group mb-3">
+        @foreach (var file in Model.Attachments)
+        {
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                <a asp-action="Download" asp-route-id="@file.Id">@file.FileName</a>
+            </li>
+        }
+    </ul>
+}
+else
+{
+    <p class="text-muted">Brak załączników.</p>
+}

@@ -1,0 +1,19 @@
+﻿@model Ticket
+
+@{
+    ViewData["Title"] = "Delete Ticket";
+}
+
+<h2>Delete Ticket</h2>
+
+<div class="alert alert-danger">
+    <h4>Are you sure you want to delete this ticket?</h4>
+    <p><strong>@Model.Title</strong></p>
+</div>
+
+<form asp-action="Delete" method="post">
+    <!-- zmiana z DeleteConfirmed na Delete -->
+    <input type="hidden" asp-for="Id" />
+    <button type="submit" class="btn btn-danger">Yes, Delete</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+</form>
