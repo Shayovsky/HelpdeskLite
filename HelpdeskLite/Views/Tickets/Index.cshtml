@@ -2,6 +2,10 @@
 
 @{
     ViewData["Title"] = "My Tickets";
+    var searchString = Context.Request.Query["searchString"].ToString();
+    var statusFilter = Context.Request.Query["statusFilter"].ToString();
+    var priorityFilter = Context.Request.Query["priorityFilter"].ToString();
+    var sortOrder = Context.Request.Query["sortOrder"].ToString();
 }
 
 <h2>My Tickets</h2>
@@ -10,25 +14,73 @@
     <a asp-action="Create" class="btn btn-primary">+ Create New Ticket</a>
 </p>
 
+<form method="get" class="row g-2 mb-3">
+    <div class="col-md-4">
+        <input type="text" name="searchString" value="@searchString" class="form-control" placeholder="Search..." />
+    </div>
+
+    <div class="col-md-2">
+        <select name="statusFilter" class="form-select">
+            <option value="">-- Status --</option>
+            <option value="New" selected="@(statusFilter == "New")">New</option>
+            <option value="InProgress" selected="@(statusFilter == "InProgress")">In Progress</option>
+            <option value="Closed" selected="@(statusFilter == "Closed")">Closed</option>
+        </select>
+    </div>
+
+    <div class="col-md-2">
+        <select name="priorityFilter" class="form-select">
+            <option value="">-- Priority --</option>
+            <option value="Low" selected="@(priorityFilter == "Low")">Low</option>
+            <option value="Normal" selected="@(priorityFilter == "Normal")">Normal</option>
+            <option value="High" selected="@(priorityFilter == "High")">High</option>
+        </select>
+    </div>
+
+    <div class="col-md-2">
+        <select name="sortOrder" class="form-select">
+            <option value="date_desc" selected="@(sortOrder == "date_desc")">Newest</option>
+            <option value="date_asc" selected="@(sortOrder == "date_asc")">Oldest</option>
+        </select>
+    </div>
+
+    <div class="col-md-2">
+        <button type="submit" class="btn btn-secondary w-100">Filter</button>
+    </div>
+</form>
+
 <table class="table table-striped">
     <thead>
         <tr>
             <th>@Html.DisplayNameFor(model => model.Title)</th>
+            <th>Status</th>
+            <th>Priority</th>
             <th>@Html.DisplayNameFor(model => model.CreatedAt)</th>
             <th></th>
         </tr>
     </thead>
     <tbody>
-        @foreach (var item in Model)
+        @if (Model.Any())
+        {
+            foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.Title</td>
+                    <td>@item.Status</td>
+                    <td>@item.Priority</td>
+                    <td>@item.CreatedAt.ToString("g")</td>
+                    <td>
+                        <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info">Details</a>
+                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning">Edit</a>
+                        <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger">Delete</a>
+                    </td>
+                </tr>
+            }
+        }
+        else
         {
             <tr>
-                <td>@item.Title</td>
-                <td>@item.CreatedAt.ToString("g")</td>
-                <td>
-                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info">Details</a>
-                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning">Edit</a>
-                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger">Delete</a>
-                </td>
+                <td colspan="5" class="text-center text-muted">No tickets found</td>
             </tr>
         }
     </tbody>

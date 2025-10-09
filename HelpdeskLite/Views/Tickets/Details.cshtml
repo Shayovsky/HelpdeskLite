@@ -4,27 +4,50 @@
     ViewData["Title"] = "Ticket Details";
 }
 
-<h2 class="mb-4">Szczegóły zgłoszenia</h2>
+<h2 class="mb-4">Ticket Details</h2>
 
+<!-- Ticket Info -->
 <div class="card mb-4 shadow-sm">
     <div class="card-body">
         <h4 class="card-title">@Model.Title</h4>
         <p class="card-text">@Model.Description</p>
         <p class="text-muted mb-0">
-            <strong>Utworzono:</strong> @Model.CreatedAt.ToString("g") <br />
-            <strong>Autor:</strong> @Model.CreatedBy
+            <strong>Created:</strong> @Model.CreatedAt.ToString("g") <br />
+            <strong>Author:</strong> @Model.CreatedBy <br />
+            <strong>Status:</strong> @Model.Status <br />
+            <strong>Priority:</strong> @Model.Priority <br />
+            <strong>Assigned to:</strong> @(Model.AssignedToId ?? "None")
         </p>
     </div>
 </div>
 
+<!-- Actions -->
 <div class="d-flex gap-2 mb-4">
-    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Edytuj</a>
-    <a asp-action="Index" class="btn btn-secondary">Powrót</a>
+    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Edit</a>
+    <a asp-action="Index" class="btn btn-secondary">Back</a>
 </div>
+
+<!-- Status Change -->
+<form asp-action="ChangeStatus" method="post" class="mb-3 d-flex gap-2 align-items-center">
+    <input type="hidden" name="id" value="@Model.Id" />
+    <select name="status" class="form-select w-auto">
+        <option value="New" selected="@(Model.Status == "New")">New</option>
+        <option value="InProgress" selected="@(Model.Status == "InProgress")">In Progress</option>
+        <option value="Closed" selected="@(Model.Status == "Closed")">Closed</option>
+    </select>
+    <button type="submit" class="btn btn-sm btn-primary">Change Status</button>
+</form>
+
+<!-- Assign to Me -->
+<form asp-action="AssignToMe" method="post" class="mb-4">
+    <input type="hidden" name="id" value="@Model.Id" />
+    <button type="submit" class="btn btn-sm btn-success">Assign to Me</button>
+</form>
 
 <hr />
 
-<h3 class="mb-3">Komentarze</h3>
+<!-- Comments -->
+<h3 class="mb-3">Comments</h3>
 
 @if (Model.Comments.Any())
 {
@@ -32,24 +55,24 @@
         @foreach (var comment in Model.Comments.OrderByDescending(c => c.CreatedAt))
         {
             <li class="list-group-item">
-                <div class="d-flex justify-content-between">
+                <div class="d-flex justify-content-between mb-1">
                     <strong>@comment.User?.UserName</strong>
-                    <em class="text-muted">@comment.CreatedAt.ToString("g")</em>
+                    <small class="text-muted">@comment.CreatedAt.ToLocalTime().ToString("g")</small>
                 </div>
-                <p class="mt-2 mb-0">@comment.Content</p>
+                <p class="mb-0">@comment.Content</p>
             </li>
         }
     </ul>
 }
 else
 {
-    <p class="text-muted">Brak komentarzy.</p>
+    <p class="text-muted">No comments yet.</p>
 }
 
+<!-- Add Comment -->
 <div class="card mb-4 shadow-sm">
     <div class="card-body">
-        <h4 class="card-title">Dodaj komentarz</h4>
-
+        <h4 class="card-title">Add Comment</h4>
         @Html.ValidationSummary(true, "", new { @class = "text-danger" })
 
         <form asp-action="AddComment" method="post">
@@ -57,19 +80,19 @@ else
             <input type="hidden" name="ticketId" value="@Model.Id" />
 
             <div class="mb-3">
-                <label for="commentContent" class="form-label">Treść komentarza</label>
+                <label for="commentContent" class="form-label">Comment</label>
                 <textarea id="commentContent" class="form-control" name="Content" rows="3" required maxlength="500"></textarea>
-                <span class="text-danger"></span>
             </div>
 
-            <button type="submit" class="btn btn-primary">Dodaj komentarz</button>
+            <button type="submit" class="btn btn-primary">Add Comment</button>
         </form>
     </div>
 </div>
 
 <hr />
 
-<h3 class="mb-3">Załączniki</h3>
+<!-- Attachments -->
+<h3 class="mb-3">Attachments</h3>
 
 @if (Model.Attachments.Any())
 {
@@ -84,5 +107,15 @@ else
 }
 else
 {
-    <p class="text-muted">Brak załączników.</p>
+    <p class="text-muted">No attachments.</p>
 }
+
+@if (Model.ClosedBySystem)
+{
+    <div class="alert alert-info">
+        This ticket was automatically closed by the system after 7 days in 
+        state.
+    </div>
+}
+
+@Html.ValidationSummary()

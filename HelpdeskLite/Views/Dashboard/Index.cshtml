@@ -1,0 +1,45 @@
+﻿@model HelpdeskLite.Models.DashboardViewModel
+
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<h2 Dashboard</h2>
+
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card text-white bg-primary mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Total Tickets</h5>
+                <p class="card-text display-6">@Model.TotalTickets</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-success mb-3">
+            <div class="card-body">
+                <h5 class="card-title">New Today</h5>
+                <p class="card-text display-6">@Model.NewToday</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<h4>Status Breakdown</h4>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Status</th>
+            <th>Count</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var kvp in Model.StatusCounts)
+        {
+            <tr>
+                <td>@kvp.Key</td>
+                <td>@kvp.Value</td>
+            </tr>
+        }
+    </tbody>
+</table>

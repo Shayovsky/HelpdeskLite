@@ -36,6 +36,7 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.AccessDeniedPath = "/Identity/Account/AccessDenied";
 });
 
+builder.Services.AddHostedService<TicketCleanupService>();
 var app = builder.Build();
 
 // Seedowanie ról
